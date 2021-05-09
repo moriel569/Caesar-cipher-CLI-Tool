@@ -13,6 +13,17 @@ let shift = yargs.shift;
 let input = yargs.input;
 let output = yargs.output;
 
+if (!input) {
+  process.stdout.write(
+    `Please enter string for encoding/decoding or Ctrl + C for exit`
+  );
+  process.stdout.write("\n> ");
+  process.stdin.on("data", (data) => {
+    let stringifiedData = data.toString();
+    process.stdout.write(commands.applyAction(shift, stringifiedData, action));
+  });
+}
+
 const transform = new Transform({
   transform(chunk, encoding, callback) {
     let chunkString = chunk.toString();
@@ -21,14 +32,16 @@ const transform = new Transform({
   },
 });
 
-fs.createReadStream(input)
-  .pipe(transform)
-  .pipe(fs.createWriteStream(output))
-  .on("finish", () => {
-    if (action === "encode") {
-      return console.log("Encryption done!");
-    }
-    if (action === "decode") {
-      return console.log("Decryption done!");
-    }
-  });
+if (input) {
+  fs.createReadStream(input)
+    .pipe(transform)
+    .pipe(fs.createWriteStream(output))
+    .on("finish", () => {
+      if (action === "encode") {
+        return console.log("Encryption done!");
+      }
+      if (action === "decode") {
+        return console.log("Decryption done!");
+      }
+    });
+}
