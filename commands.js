@@ -1,5 +1,9 @@
-const encode = (shift, text) => {
+const applyAction = (shift, text, action) => {
   let result = "";
+  if (action === "decode") {
+    shift = -shift;
+  }
+
   for (let i = 0; i < text.length; i++) {
     let charCode = text[i].charCodeAt();
 
@@ -26,11 +30,6 @@ const encode = (shift, text) => {
   return result;
 };
 
-const decode = (shift, text) => {
-  console.log(shift, text);
-};
-
 module.exports = {
-  encode,
-  decode,
+  applyAction,
 };

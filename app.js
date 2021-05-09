@@ -11,22 +11,24 @@ const commands = require("./commands");
 let action = yargs.action;
 let shift = yargs.shift;
 let input = yargs.input;
-// let output = yargs.output;
+let output = yargs.output;
 
 const transform = new Transform({
   transform(chunk, encoding, callback) {
     let chunkString = chunk.toString();
-    if (action === "encode") {
-      let encoded = commands.encode(shift, chunkString);
-      callback(null, encoded);
-    } else if (action === "decode") {
-      let decoded = commands.decode(shift, chunkString);
-      callback(null, decoded);
-    }
+    let transformed = commands.applyAction(shift, chunkString, action);
+    callback(null, transformed);
   },
 });
 
 fs.createReadStream(input)
   .pipe(transform)
-  .pipe(fs.createWriteStream("output.txt"))
-  .on("finish", () => console.log("Done"));
+  .pipe(fs.createWriteStream(output))
+  .on("finish", () => {
+    if (action === "encode") {
+      return console.log("Encryption done!");
+    }
+    if (action === "decode") {
+      return console.log("Decryption done!");
+    }
+  });
